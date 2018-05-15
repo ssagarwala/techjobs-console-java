@@ -10,6 +10,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Created by LaunchCode
@@ -26,7 +29,8 @@ public class JobData {
      * without duplicates, for a given column.
      *
      * @param field The column to retrieve values from
-     * @return List of all of the values of the given field
+     * @return List of all of the values of the given field0
+     *
      */
     public static ArrayList<String> findAll(String field) {
 
@@ -37,11 +41,11 @@ public class JobData {
 
         for (HashMap<String, String> row : allJobs) {
             String aValue = row.get(field);
-
-            if (!values.contains(aValue)) {
-                values.add(aValue);
-            }
+           if (!values.contains(aValue)) {
+                    values.add(aValue);
+                }
         }
+        Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
 
         return values;
     }
@@ -70,19 +74,76 @@ public class JobData {
         // load data, if not already loaded
         loadData();
 
+        //an empty ArrayList that will contain HashMap objects of jobs
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
 
+        //from the Class Static variable i.e an ArrayList of HashMap Objects.
+        //HashMap objects contain Job details.
+        //Get each HashMap job object from an ArrayList of allJobs objects
         for (HashMap<String, String> row : allJobs) {
 
+            //From Row HashMap (job) Object find the column like
+            //Position Type or core competency. First get the column requested
+            //then check if the column has the value requested
             String aValue = row.get(column);
 
-            if (aValue.contains(value)) {
+            //if (aValue.contains(value)) {
+            if(caseInsensitiveSearch(aValue,value)){
                 jobs.add(row);
             }
         }
 
         return jobs;
     }
+
+    public static ArrayList<HashMap<String,String>> findByValue(String value){
+        loadData();
+        //an empty ArrayList that will contain HashMap objects of jobs
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+        //from the Class Static variable i.e an ArrayList of HashMap Objects.
+        //HashMap objects contain Job details.
+        //Get each HashMap job object from an ArrayList of allJobs objects
+        for (HashMap<String, String> row : allJobs) {
+            Iterator<Map.Entry<String, String>> iterator = row.entrySet().iterator();
+            boolean found = false;
+            while (iterator.hasNext() && !found) {
+                Map.Entry<String, String> mapEntry = iterator.next();
+                String keyValue = mapEntry.getValue();
+                //System.out.println("keyValue"+keyValue);
+                if (caseInsensitiveSearch(keyValue,value)) {
+                    jobs.add(row);
+                    found = true;
+                }
+            }
+        }
+            return jobs;
+    }
+
+    /**
+     * Case Insensitive Search.
+     * @param findIn Value of the field to search for
+     * @param query Search term entered by the User.
+     * @return true or false after performing case Insensitive Search
+     */
+    public static boolean caseInsensitiveSearch (String findIn, String query){
+
+        String query_lower = query.toLowerCase();
+        String[] findInArray = findIn.split(" ");
+        boolean found = false;
+        int i = 0;
+        while (!found && findInArray.length > i) {
+            String ar = findInArray[i];
+            String ar_lower = ar.toLowerCase();
+            if (query_lower.equals(ar_lower)) {
+                found = true;
+            }
+            i++;
+        }
+        return found;
+    }
+
+
+
 
     /**
      * Read in data from a CSV file and store it in a list
