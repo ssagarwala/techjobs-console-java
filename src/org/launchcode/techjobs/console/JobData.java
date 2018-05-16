@@ -13,6 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Collections;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Created by LaunchCode
@@ -23,6 +36,7 @@ public class JobData {
     private static Boolean isDataLoaded = false;
 
     private static ArrayList<HashMap<String, String>> allJobs;
+    private static ArrayList<HashMap<String, String>> allJobsCopy;
 
     /**
      * Fetch list of all values from loaded data,
@@ -39,7 +53,7 @@ public class JobData {
 
         ArrayList<String> values = new ArrayList<>();
 
-        for (HashMap<String, String> row : allJobs) {
+        for (HashMap<String, String> row : allJobsCopy) {
             String aValue = row.get(field);
            if (!values.contains(aValue)) {
                     values.add(aValue);
@@ -55,7 +69,7 @@ public class JobData {
         // load data, if not already loaded
         loadData();
 
-        return allJobs;
+        return allJobsCopy;
     }
 
     /**
@@ -79,8 +93,8 @@ public class JobData {
 
         //from the Class Static variable i.e an ArrayList of HashMap Objects.
         //HashMap objects contain Job details.
-        //Get each HashMap job object from an ArrayList of allJobs objects
-        for (HashMap<String, String> row : allJobs) {
+        //Get each HashMap job object from an ArrayList of allJobsCopy objects
+        for (HashMap<String, String> row : allJobsCopy) {
 
             //From Row HashMap (job) Object find the column like
             //Position Type or core competency. First get the column requested
@@ -103,7 +117,7 @@ public class JobData {
         //from the Class Static variable i.e an ArrayList of HashMap Objects.
         //HashMap objects contain Job details.
         //Get each HashMap job object from an ArrayList of allJobs objects
-        for (HashMap<String, String> row : allJobs) {
+        for (HashMap<String, String> row : allJobsCopy) {
             Iterator<Map.Entry<String, String>> iterator = row.entrySet().iterator();
             boolean found = false;
             while (iterator.hasNext() && !found) {
@@ -166,6 +180,7 @@ public class JobData {
 
             allJobs = new ArrayList<>();
 
+
             // Put the records into a more friendly format
             for (CSVRecord record : records) {
                 HashMap<String, String> newJob = new HashMap<>();
@@ -176,7 +191,7 @@ public class JobData {
 
                 allJobs.add(newJob);
             }
-
+            allJobsCopy = (ArrayList<HashMap<String, String>>)allJobs.clone();
             // flag the data as loaded, so we don't do it twice
             isDataLoaded = true;
 
